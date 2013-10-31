@@ -11,3 +11,5 @@ RUN wget --directory-prefix=/opt https://raw.github.com/proppen/docker/master/at
 
 # Unattended Jira install
 RUN sh /opt/atlassian-jira-6.1.2-x64.bin -q -varfile /opt/response.varfile
+
+EXPOSE 8080
