@@ -1,0 +1,14 @@
+{
+  "postgresql": {
+    "password": {
+      "postgres": "md5sumhash"
+    },
+    "config_pgtune": {
+      "db_type": "TUNETYPE"
+    }
+  },
+  "run_list": ["recipe[postgresql::server]"],
+  "run_list": ["recipe[postgresql::config_initdb]"],
+  "run_list": ["recipe[postgresql::config_pgtune]"]
+}
+
