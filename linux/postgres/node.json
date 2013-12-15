@@ -1,11 +1,15 @@
 {
-  "run_list": [ "recipe[postgresql::server]","recipe[postgresql::config_initdb]" ],
+  "run_list": [ "recipe[postgresql::client]","recipe[postgresql::server]","recipe[postgresql::config_initdb]" ],
   "postgresql": {
     "config": {
+      "listen_addresses": "*",
+      
       "ssl": false
     },
+    "pg_hba": [
+      { "type": "local", "db": "all", "user": "all", "addr": "", "method": "trust" }
+    ],
     "password": {
-      "postgres": "md503a296db01f1dd17ca15bbd0e2d3b57b"
+      "postgres": "md5sumhash"
     }
 }
-

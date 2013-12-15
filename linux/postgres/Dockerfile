@@ -1,13 +1,11 @@
-FROM ubuntu
+FROM linux/chef-solo
 
 MAINTAINER Tom Eklöf tom@linux-konsult.com
 
-RUN apt-get -y update
+# Expose the Postgresql port
+EXPOSE 5432
 
-### Install Chef
-RUN apt-get -y install curl build-essential libxml2-dev libxslt-dev git
-RUN curl -L https://www.opscode.com/chef/install.sh | bash
-RUN echo "gem: --no-ri --no-rdoc" > ~/.gemrc
+RUN apt-get -y update
 
 # Add chef files
 ADD ./solo.rb /etc/chef/solo.rb
@@ -16,16 +14,15 @@ ADD ./node.json /etc/chef/node.json
 # Add Berksfile to install cookbooks
 ADD ./Berksfile /Berksfile
 
-
-### Configuration ###
 # Change the dbpassword string below to something good.
 RUN sed -i "s%md5sumhash%$(echo -n 'dbpassword%g''postgres' | openssl md5 | sed -e 's/.* /md5/')%g" /etc/chef/node.json
 
-### /Configuration ###
-
-# Install Berkshelf and cookbooks
-RUN /opt/chef/embedded/bin/gem install berkshelf
+# Install cookbooks defined in Berkshelf file
 RUN /opt/chef/embedded/bin/berks install --path /etc/chef/cookbooks/
 
 # Run cookbooks
 RUN chef-solo
+
+# Start the service
+ENTRYPOINT ["/bin/su", "postgres", "-c", "/usr/lib/postgresql/9.1/bin/postgres -D /var/lib/postgresql/9.1/main -c config_file=/etc/postgresql/9.1/main/postgresql.conf"]
+
