@@ -1,6 +1,5 @@
 # Docker container with chef-solo & berkshelf
 FROM ubuntu
-#FROM base
 MAINTAINER Tom Eklöf "tom@linux-konsult.com"
 
 RUN apt-get -y update
