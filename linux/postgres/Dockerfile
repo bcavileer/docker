@@ -1,12 +1,15 @@
-FROM linux/chef-solo
+FROM ubuntu
 
 MAINTAINER Tom Eklöf tom@linux-konsult.com
 
 RUN apt-get -y update
 
+### Install Chef
+RUN apt-get -y install curl build-essential libxml2-dev libxslt-dev git
+RUN curl -L https://www.opscode.com/chef/install.sh | bash
+RUN echo "gem: --no-ri --no-rdoc" > ~/.gemrc
+
 # Add chef files
-#ADD https://raw.github.com/proppen/docker/master/linux/chef-solo/solo.rb /etc/chef/solo.rb
-#ADD https://raw.github.com/proppen/docker/master/linux/postgres/node.json /etc/chef/node.json
 ADD ./solo.rb /etc/chef/solo.rb
 ADD ./node.json /etc/chef/node.json
 
@@ -17,14 +20,6 @@ ADD ./Berksfile /Berksfile
 ### Configuration ###
 # Change the dbpassword string below to something good.
 RUN sed -i "s%md5sumhash%$(echo -n 'dbpassword%g''postgres' | openssl md5 | sed -e 's/.* /md5/')%g" /etc/chef/node.json
-
-# Change 'web' to one of the following availble performance profiles:
-#   "dw" -- Data Warehouse
-#   "oltp" -- Online Transaction Processing
-#   "web" -- Web Application
-#   "mixed" -- Mixed DW and OLTP characteristics
-#   "desktop" -- Not a dedicated database
-RUN sed -i 's/TUNETYPE/web/g' /etc/chef/node.json
 
 ### /Configuration ###
 
