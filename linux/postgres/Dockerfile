@@ -7,6 +7,9 @@ EXPOSE 5432
 
 RUN apt-get -y update
 
+# Add postgres start script
+ADD ./postgres.sh /postgres.sh
+
 # Add chef files
 ADD ./solo.rb /etc/chef/solo.rb
 ADD ./node.json /etc/chef/node.json
@@ -15,7 +18,8 @@ ADD ./node.json /etc/chef/node.json
 ADD ./Berksfile /Berksfile
 
 # Change the dbpassword string below to something good.
-RUN sed -i "s%md5sumhash%$(echo -n 'dbpassword%g''postgres' | openssl md5 | sed -e 's/.* /md5/')%g" /etc/chef/node.json
+#RUN sed -i "s%md5sumhash%$(echo -n 'dbpassword%g''postgres' | openssl md5 | sed -e 's/.* /md5/')%g" /etc/chef/node.json
+RUN sed -i "s%md5sumhash%$(echo -n 'dbpassword' | openssl md5 | sed -e 's/.* /md5/')%g" /etc/chef/node.json
 
 # Install cookbooks defined in Berkshelf file
 RUN /opt/chef/embedded/bin/berks install --path /etc/chef/cookbooks/
@@ -24,5 +28,4 @@ RUN /opt/chef/embedded/bin/berks install --path /etc/chef/cookbooks/
 RUN chef-solo
 
 # Start the service
-ENTRYPOINT ["/bin/su", "postgres", "-c", "/usr/lib/postgresql/9.1/bin/postgres -D /var/lib/postgresql/9.1/main -c config_file=/etc/postgresql/9.1/main/postgresql.conf"]
-
+CMD ["/postgres.sh"]
